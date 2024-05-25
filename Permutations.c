@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "datatypes/map.h"
-#include "datatypes/stack.h"
-#include "datatypes/list.h"
 
-int** generatePermutations(int, int[]);
-void recursionPermutations(Map**, int, int[]);
+int** permute(int*, int, int*);
+void backtrack(int*, int, int**, int***, int);
+void swap(int*, int*);
 
 int main(){
     int n;
@@ -16,26 +14,49 @@ int main(){
         printf("Enter %d element:", (i+1));
         scanf("%d", &arr[i]);
     }
-    int** res = generatePermutations(n, arr);
+    int returnSize;
+    int** res = permute(arr, n, &returnSize);
+    for(int i = 0; i < returnSize; i++){
+        for(int j = 0; j < n; j++){
+            printf("%d ", res[i][j]);
+        }
+        printf("\n");
+    }
     return 0;
 }
 
-// int** recursionPermutations(Map** m, int n, int ar[]){
-//     int i = 0;
-//     if( == n){
-//         *(result)
-//     }
-// }
+void swap(int* a, int* b){
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
 
-int** generatePermutations(int n, int arr[]){
-    int* s;
-    Map* m;
-    _initMap_(&m);
-    for(int i = 0; i < n; i++){
-        insert(&m, arr[i], 0);
+void backtrack(int* nums, int numsSize, int** returnSize, int*** result, int index){
+    if(index == numsSize){
+        (**returnSize)++;
+        *result = (int**)realloc(*result, sizeof(int*) * (**returnSize));
+        (*result)[**returnSize - 1] = (int*)malloc(sizeof(int) * numsSize);
+        for(int i=0; i<numsSize; i++){
+            (*result)[**returnSize - 1][i] = nums[i];
+        }
+        return;
     }
-    printMap(*m);
+    for(int i = index; i < numsSize; i++){
+        swap(nums+index, nums+i);
+        backtrack(nums, numsSize, returnSize, result, index + 1);
+        swap(nums+index, nums+i);
+    }
+}
+
+int** permute(int* nums, int numsSize, int* returnSize){
     int** result;
-    // recursionPermutations(&result, &s, &m, n, arr);
+    *returnSize = 1;
+
+    for(int i = 1; i <= numsSize; i++) (*returnSize) *= i;
+    
+    result = (int**)malloc(sizeof(int*));
+    *returnSize = 0;
+
+    backtrack(nums, numsSize, &returnSize, &result, 0);
     return result;
 }
